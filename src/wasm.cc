@@ -122,7 +122,7 @@ void WasmBase::registerCallbacks() {
 
   // Calls with the "proxy_" prefix.
 #define _REGISTER_PROXY(_fn)                                                                       \
-  wasm_vm_->registerCallback(                                                                      \
+  wasm_vm_->registerCallbackIfExposed(                                                             \
       "env", "proxy_" #_fn, &exports::_fn,                                                         \
       &ConvertFunctionWordToUint32<decltype(exports::_fn),                                         \
                                    exports::_fn>::convertFunctionWordToUint32);
@@ -208,8 +208,8 @@ void WasmBase::getFunctions() {
 #undef _GET_ALIAS
 #undef _GET
 
-#define _GET_PROXY(_fn) wasm_vm_->getFunction("proxy_" #_fn, &_fn##_);
-#define _GET_PROXY_ABI(_fn, _abi) wasm_vm_->getFunction("proxy_" #_fn, &_fn##_abi##_);
+#define _GET_PROXY(_fn) wasm_vm_->getFunctionIfExposed("proxy_" #_fn, &_fn##_);
+#define _GET_PROXY_ABI(_fn, _abi) wasm_vm_->getFunctionIfExposed("proxy_" #_fn, &_fn##_abi##_);
   _GET_PROXY(validate_configuration);
   _GET_PROXY(on_vm_start);
   _GET_PROXY(on_configure);
