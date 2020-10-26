@@ -273,11 +273,11 @@ public:
 #undef _REGISTER_CALLBACK
 
   bool isFunctionExposed(std::string_view function_name) {
-    return exposed_functions_.find(function_name) != exposed_functions_.end();
+    return exposed_functions_.find(std::string(function_name)) != exposed_functions_.end();
   }
 
   void exposeFunction(std::string_view function_name) {
-    exposed_functions_.insert(function_name);
+    exposed_functions_.insert(std::string(function_name));
   }
 
   /**
@@ -287,8 +287,6 @@ public:
   void getFunctionIfExposed(std::string_view function_name, _T *f) {                               \
     if (isFunctionExposed(function_name)) {                                                        \
       getFunction(function_name, f);                                                               \
-    } else {                                                                                       \
-      rejected_functions_.insert(function_name);                                                   \
     }                                                                                              \
   };
   FOR_ALL_WASM_VM_EXPORTS(_GET_FUNCTION_IF_EXPOSED)
@@ -302,8 +300,6 @@ public:
     std::string_view function_name, _T f, typename ConvertFunctionTypeWordToUint32<_T>::type t) {  \
     if (isFunctionExposed(function_name)) {                                                        \
       registerCallback(moduleName, function_name, f, t);                                           \
-    } else {                                                                                       \
-      rejected_functions_.insert(function_name);                                                   \
     }                                                                                              \
   };
   FOR_ALL_WASM_VM_IMPORTS(_REGISTER_CALLBACK_IF_EXPOSED)
@@ -329,8 +325,7 @@ protected:
   std::unique_ptr<WasmVmIntegration> integration_;
   FailState failed_ = FailState::Ok;
   std::function<void(FailState)> fail_callback_;
-  std::unordered_set<std::string_view> exposed_functions_;
-  std::unordered_set<std::string_view> rejected_functions_;
+  std::unordered_set<std::string> exposed_functions_;
 };
 
 // Thread local state set during a call into a WASM VM so that calls coming out of the
