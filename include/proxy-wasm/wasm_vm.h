@@ -273,7 +273,8 @@ public:
 #undef _REGISTER_CALLBACK
 
   bool isFunctionExposed(std::string_view function_name) {
-    return exposed_functions_.find(std::string(function_name)) != exposed_functions_.end();
+    return exposed_functions_.find(static_cast<std::string>(function_name)) 
+      != exposed_functions_.end();
   }
 
   void exposeFunction(std::string_view function_name) {
