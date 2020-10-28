@@ -273,8 +273,8 @@ public:
 #undef _REGISTER_CALLBACK
 
   bool isFunctionExposed(std::string_view function_name) {
-    return exposed_functions_.find(static_cast<std::string>(function_name)) 
-      != exposed_functions_.end();
+    return expose_all_functions_ ||
+      (exposed_functions_.find(std::string(function_name)) != exposed_functions_.end());
   }
 
   void exposeFunction(std::string_view function_name) {
@@ -283,6 +283,10 @@ public:
 
   void exposeFunctions(std::unordered_set<std::string> function_names) {
     exposed_functions_.merge(function_names);
+  }
+
+  void restrictABI() {
+    expose_all_functions_ = false;
   }
 
   /**
@@ -331,6 +335,7 @@ protected:
   FailState failed_ = FailState::Ok;
   std::function<void(FailState)> fail_callback_;
   std::unordered_set<std::string> exposed_functions_;
+  bool expose_all_functions_ = true;
 };
 
 // Thread local state set during a call into a WASM VM so that calls coming out of the
