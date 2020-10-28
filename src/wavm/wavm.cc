@@ -336,9 +336,9 @@ bool Wavm::link(std::string_view debug_name) {
   memory_ = getDefaultMemory(module_instance_);
   memory_base_ = WAVM::Runtime::getMemoryBaseAddress(memory_);
   auto exports = getInstanceExports(module_instance_);
-  for (auto &e : exports) {
-    if (!isFunctionExposed(e.name)) {
-      fail(FailState::MissingFunction, "Failed to load Wasm module due to a missing import(s)");
+  for (auto object : exports) {
+    if (!isFunctionExposed(object->name)) {
+      error("Missing Wasm export: " + object->name);
     }
   }
   return true;

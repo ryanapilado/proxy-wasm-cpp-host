@@ -281,6 +281,10 @@ public:
     exposed_functions_.insert(std::string(function_name));
   }
 
+  void exposeFunctions(std::unordered_set<std::string> function_names) {
+    exposed_functions_.merge(function_names);
+  }
+
   /**
    * Get typed function exported by the WASM module.
    */
