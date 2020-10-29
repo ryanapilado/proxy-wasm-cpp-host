@@ -338,10 +338,10 @@ bool Wavm::link(std::string_view debug_name) {
   auto exports = getInstanceExports(module_instance_);
   for (auto object : exports) {
     if (!isFunctionExposed(object->name)) {
-      error("Missing Wasm export: " + object->name);
+      fail(FailState::MissingFunction, "Missing Wasm export: " + object->name);
     }
   }
-  return true;
+  return !isFailed();
 }
 
 uint64_t Wavm::getMemorySize() { return WAVM::Runtime::getMemoryNumPages(memory_) * WasmPageSize; }

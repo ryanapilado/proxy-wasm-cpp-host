@@ -281,10 +281,6 @@ public:
     exposed_functions_.insert(std::string(function_name));
   }
 
-  void exposeFunctions(std::unordered_set<std::string> function_names) {
-    exposed_functions_.merge(function_names);
-  }
-
   void restrictABI() {
     expose_all_functions_ = false;
   }
@@ -296,6 +292,8 @@ public:
   void getFunctionIfExposed(std::string_view function_name, _T *f) {                               \
     if (isFunctionExposed(function_name)) {                                                        \
       getFunction(function_name, f);                                                               \
+    } else {                                                                                       \
+      *f = nullptr;                                                                                \
     }                                                                                              \
   };
   FOR_ALL_WASM_VM_EXPORTS(_GET_FUNCTION_IF_EXPOSED)
