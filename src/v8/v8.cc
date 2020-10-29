@@ -489,7 +489,8 @@ bool V8::link(std::string_view debug_name) {
 
     case wasm::EXTERN_FUNC: {
       if (!isFunctionExposed(name)) {
-        error("Attempted export of unexposed ABI function" + std::string(name));
+        fail(FailState::MissingFunction,
+          "Attempted export of unexposed ABI function" + std::string(name));
       }
       assert(export_item->func() != nullptr);
       module_functions_.insert_or_assign(name, export_item->func()->copy());
