@@ -415,13 +415,6 @@ bool V8::link(std::string_view debug_name) {
     switch (import_type->kind()) {
 
     case wasm::EXTERN_FUNC: {
-      if (!isFunctionExposed(name)) {
-        fail(FailState::UnableToInitializeCode,
-              std::string(
-                 "Failed to load Wasm module due to attempted import of unexposed ABI function") +
-              std::string(name));
-        break;
-      }
       auto it = host_functions_.find(std::string(module) + "." + std::string(name));
       if (it == host_functions_.end()) {
         fail(FailState::UnableToInitializeCode,
@@ -488,10 +481,6 @@ bool V8::link(std::string_view debug_name) {
     switch (export_type->kind()) {
 
     case wasm::EXTERN_FUNC: {
-      if (!isFunctionExposed(name)) {
-        fail(FailState::MissingFunction,
-          "Attempted export of unexposed ABI function" + std::string(name));
-      }
       assert(export_item->func() != nullptr);
       module_functions_.insert_or_assign(name, export_item->func()->copy());
     } break;
