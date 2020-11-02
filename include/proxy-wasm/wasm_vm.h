@@ -285,33 +285,6 @@ public:
     expose_all_functions_ = false;
   }
 
-  /**
-   * Get typed function exported by the WASM module.
-   */
-#define _GET_FUNCTION_IF_EXPOSED(_T)                                                               \
-  void getFunctionIfExposed(std::string_view function_name, _T *f) {                               \
-    if (isFunctionExposed(function_name)) {                                                        \
-      getFunction(function_name, f);                                                               \
-    } else {                                                                                       \
-      *f = nullptr;                                                                                \
-    }                                                                                              \
-  };
-  FOR_ALL_WASM_VM_EXPORTS(_GET_FUNCTION_IF_EXPOSED)
-#undef _GET_FUNCTION_IF_EXPOSED
-
-  /**
-   * Register typed callbacks exported by the host environment.
-   */
-#define _REGISTER_CALLBACK_IF_EXPOSED(_T)                                                          \
-  void registerCallbackIfExposed(std::string_view moduleName,                                      \
-    std::string_view function_name, _T f, typename ConvertFunctionTypeWordToUint32<_T>::type t) {  \
-    if (isFunctionExposed(function_name)) {                                                        \
-      registerCallback(moduleName, function_name, f, t);                                           \
-    }                                                                                              \
-  };
-  FOR_ALL_WASM_VM_IMPORTS(_REGISTER_CALLBACK_IF_EXPOSED)
-#undef _REGISTER_CALLBACK_IF_EXPOSED
-
   bool isFailed() { return failed_ != FailState::Ok; }
   void fail(FailState fail_state, std::string_view message) {
     error(message);
