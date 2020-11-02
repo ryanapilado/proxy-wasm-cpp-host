@@ -123,7 +123,7 @@ void WasmBase::registerCallbacks() {
   // Calls with the "proxy_" prefix.
 #define _REGISTER_PROXY(_fn)                                                                       \
   if (wasm_vm_->isFunctionExposed("proxy_" #_fn)) {                                                \
-  wasm_vm_->registerCallback(                                                                      \
+    wasm_vm_->registerCallback(                                                                    \
       "env", "proxy_" #_fn, &exports::_fn,                                                         \
       &ConvertFunctionWordToUint32<decltype(exports::_fn),                                         \
                                    exports::_fn>::convertFunctionWordToUint32);                    \
