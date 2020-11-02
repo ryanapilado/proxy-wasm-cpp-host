@@ -153,5 +153,28 @@ Word pthread_equal(void *, Word left, Word right);
 // Any currently executing Wasm call context.
 ::proxy_wasm::ContextBase *ContextOrEffectiveContext(::proxy_wasm::ContextBase *context);
 
+template<typename R, typename... Args>
+struct StubContainer {
+  constexpr static R stub(void *raw_context, Args...) {
+    return static_cast<R>(WasmResult::Unimplemented);
+  }
+};
+
+
+template<typename R, typename... Args>
+auto constexpr getExportStub(R (*f)(void*, Args...)) -> R (*)(void*, Args...){
+  return &StubContainer<R, Args...>::stub;
+}
+
+// template<typename R, typename... Args>
+// auto getExportStub(R (*f)(Args...)) -> StubContainer<R, Args...>{
+//   return StubContainer<R, Args...>{};
+// }
+
+// template<typename R, typename... Args>
+// auto exportStub(Args...) -> decltype(R) {
+//   return R();
+// }
+
 } // namespace exports
 } // namespace proxy_wasm
