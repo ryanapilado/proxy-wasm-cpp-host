@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "include/proxy-wasm/word.h"
+#include "wasm_vm.h"
 
 namespace proxy_wasm {
 
@@ -156,25 +157,32 @@ Word pthread_equal(void *, Word left, Word right);
 template<typename R, typename... Args>
 struct StubContainer {
   constexpr static R stub(void *raw_context, Args...) {
+    auto context = ContextOrEffectiveContext(
+      static_cast<ContextBase *>((void) raw_context, current_context_));
+    context->wasmVm()->error("Attempted call to unexposed ABI function");
     return static_cast<R>(WasmResult::Unimplemented);
   }
 };
 
+template<typename... Args>
+struct StubContainer<void, Args...> {
+  constexpr static void stub(void *raw_context, Args...) {
+    auto context = ContextOrEffectiveContext(
+      static_cast<ContextBase *>((void) raw_context, current_context_));
+    context->wasmVm()->error("Attempted call to unexposed ABI function");
+  }
+};
 
 template<typename R, typename... Args>
 auto constexpr getExportStub(R (*f)(void*, Args...)) -> R (*)(void*, Args...){
   return &StubContainer<R, Args...>::stub;
 }
 
-// template<typename R, typename... Args>
-// auto getExportStub(R (*f)(Args...)) -> StubContainer<R, Args...>{
-//   return StubContainer<R, Args...>{};
-// }
+template<typename... Args>
+auto constexpr getExportStub(void (*f)(void*, Args...)) -> void (*)(void*, Args...){
+  return &StubContainer<Args...>::stub;
+}
 
-// template<typename R, typename... Args>
-// auto exportStub(Args...) -> decltype(R) {
-//   return R();
-// }
 
 } // namespace exports
 } // namespace proxy_wasm

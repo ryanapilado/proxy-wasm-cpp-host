@@ -181,7 +181,7 @@ void WasmBase::registerCallbacks() {
   _REGISTER_PROXY(get_metric);
 
   _REGISTER_PROXY(set_effective_context);
-  // _REGISTER_PROXY(done);
+  _REGISTER_PROXY(done);
   _REGISTER_PROXY(call_foreign_function);
 
   if (abiVersion() == AbiVersion::ProxyWasm_0_1_0) {
