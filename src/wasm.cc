@@ -121,8 +121,8 @@ void WasmBase::registerCallbacks() {
 #undef _REGISTER_WASI
 
   // Calls with the "proxy_" prefix.
-#define _REGISTER_PROXY(_fn) {                                                                     \
-  if (wasm_vm_->isFunctionExposed("proxy_" #_fn)) {                                                \
+#define _REGISTER_PROXY(_fn)                                                                       \
+  if (capabilityExposed("proxy_" #_fn)) {                                                          \
     constexpr auto f = exports::getExportStub(&exports::_fn);                                      \
     wasm_vm_->registerCallback(                                                                    \
       "env", "proxy_" #_fn, f,                                                                     \
@@ -133,8 +133,8 @@ void WasmBase::registerCallbacks() {
       "env", "proxy_" #_fn, &exports::_fn,                                                         \
       &ConvertFunctionWordToUint32<decltype(exports::_fn),                                         \
                                     exports::_fn>::convertFunctionWordToUint32);                   \
-  } \
-}
+  } 
+
   _REGISTER_PROXY(log);
 
   _REGISTER_PROXY(get_status);
@@ -218,13 +218,13 @@ void WasmBase::getFunctions() {
 #undef _GET
 
 #define _GET_PROXY(_fn)                                                                            \
-  if (wasm_vm_->isFunctionExposed("proxy_" #_fn)) {                                                \
+  if (capabilityExposed("proxy_" #_fn)) {                                                          \
     wasm_vm_->getFunction("proxy_" #_fn, &_fn##_);                                                 \
   } else {                                                                                         \
     _fn##_ = nullptr;                                                                              \
   }
 #define _GET_PROXY_ABI(_fn, _abi)                                                                  \
-  if (wasm_vm_->isFunctionExposed("proxy_" #_fn)) {                                                \
+  if (capabilityExposed("proxy_" #_fn)) {                                                          \
     wasm_vm_->getFunction("proxy_" #_fn, &_fn##_abi##_);                                           \
   } else {                                                                                         \
     _fn##_abi##_ = nullptr;                                                                        \

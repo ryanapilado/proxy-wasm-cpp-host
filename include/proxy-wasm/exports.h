@@ -154,35 +154,37 @@ Word pthread_equal(void *, Word left, Word right);
 // Any currently executing Wasm call context.
 ::proxy_wasm::ContextBase *ContextOrEffectiveContext(::proxy_wasm::ContextBase *context);
 
+// Helpers for generating a stub to pass in place of an export when export is not exposed
+
 template<typename R, typename... Args>
-struct StubContainer {
-  constexpr static R stub(void *raw_context, Args...) {
+struct ExportStub {
+  constexpr static R exportStub(void *raw_context, Args...) {
     auto context = ContextOrEffectiveContext(
       static_cast<ContextBase *>((void) raw_context, current_context_));
-    context->wasmVm()->error("Attempted call to unexposed ABI function");
+    context->wasmVm()->error("Attempted call to unexposed capability");
     return static_cast<R>(WasmResult::Unimplemented);
   }
 };
 
 template<typename... Args>
-struct StubContainer<void, Args...> {
-  constexpr static void stub(void *raw_context, Args...) {
+struct ExportStub<void, Args...> {
+  constexpr static void exportStub(void *raw_context, Args...) {
     auto context = ContextOrEffectiveContext(
       static_cast<ContextBase *>((void) raw_context, current_context_));
-    context->wasmVm()->error("Attempted call to unexposed ABI function");
+    context->wasmVm()->error("Attempted call to unexposed capability");
   }
 };
 
 template<typename R, typename... Args>
 auto constexpr getExportStub(R (*f)(void*, Args...)) -> R (*)(void*, Args...){
   (void)(f); // use parameter to avoid compiler warning
-  return &StubContainer<R, Args...>::stub;
+  return &ExportStub<R, Args...>::exportStub;
 }
 
 template<typename... Args>
 auto constexpr getExportStub(void (*f)(void*, Args...)) -> void (*)(void*, Args...){
   (void)(f); // use parameter to avoid compiler warning
-  return &StubContainer<Args...>::stub;
+  return &ExportStub<Args...>::exportStub;
 }
 
 

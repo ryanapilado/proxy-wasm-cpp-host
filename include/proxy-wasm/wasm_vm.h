@@ -272,19 +272,6 @@ public:
   FOR_ALL_WASM_VM_IMPORTS(_REGISTER_CALLBACK)
 #undef _REGISTER_CALLBACK
 
-  bool isFunctionExposed(std::string_view function_name) {
-    return expose_all_functions_ ||
-      (exposed_functions_.find(std::string(function_name)) != exposed_functions_.end());
-  }
-
-  void exposeFunction(std::string_view function_name) {
-    exposed_functions_.insert(std::string(function_name));
-  }
-
-  void restrictABI() {
-    expose_all_functions_ = false;
-  }
-
   bool isFailed() { return failed_ != FailState::Ok; }
   void fail(FailState fail_state, std::string_view message) {
     error(message);
@@ -305,8 +292,6 @@ protected:
   std::unique_ptr<WasmVmIntegration> integration_;
   FailState failed_ = FailState::Ok;
   std::function<void(FailState)> fail_callback_;
-  std::unordered_set<std::string> exposed_functions_;
-  bool expose_all_functions_ = true;
 };
 
 // Thread local state set during a call into a WASM VM so that calls coming out of the

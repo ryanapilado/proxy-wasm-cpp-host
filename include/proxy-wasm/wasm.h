@@ -122,6 +122,25 @@ public:
 
   AbiVersion abiVersion() { return abi_version_; }
 
+  bool capabilityExposed(std::string_view function_name) {
+    return enforce_capability_restriction_ &&
+      (exposed_capabilities_.find(std::string(function_name)) != exposed_capabilities_.end());
+  }
+
+  // TODO(rapilado): remove these once proxy-side changes for capability restriction are in place
+  // These two functions are useful for testing capability restriction without changing the WasmBase
+  // constructor. But the constructor will have to be changed in order to propagate the config
+  // information from the proxy to here. Once the constructor has been changed these won't be
+  // necessary, since the exposed_capabilities_ and restrict_capabilities_ fields can be set in the
+  // constructor's initializer list.
+  void exposeCapability(std::string_view function_name) {
+    exposed_capabilities_.insert(std::string(function_name));
+  }
+
+  void restrictCapabilities() {
+    enforce_capability_restriction_ = false;
+  }
+
   void addAfterVmCallAction(std::function<void()> f) { after_vm_call_actions_.push_back(f); }
   void doAfterVmCallActions() {
     // NB: this may be deleted by a delayed function unless prevented.
@@ -216,6 +235,9 @@ protected:
   WasmCallWord<1> on_done_;
   WasmCallVoid<1> on_log_;
   WasmCallVoid<1> on_delete_;
+
+  std::unordered_set<std::string> exposed_capabilities_;
+  bool enforce_capability_restriction_ = true;
 
   std::shared_ptr<WasmHandleBase> base_wasm_handle_;
 
