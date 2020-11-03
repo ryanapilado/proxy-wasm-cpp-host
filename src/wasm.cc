@@ -121,18 +121,18 @@ void WasmBase::registerCallbacks() {
 #undef _REGISTER_WASI
 
   // Calls with the "proxy_" prefix.
-#define _REGISTER_PROXY(_fn) {                                                                       \
+#define _REGISTER_PROXY(_fn) {                                                                     \
   if (wasm_vm_->isFunctionExposed("proxy_" #_fn)) {                                                \
-    constexpr auto f = exports::getExportStub(&exports::_fn); \
+    constexpr auto f = exports::getExportStub(&exports::_fn);                                      \
     wasm_vm_->registerCallback(                                                                    \
-      "env", "proxy_" #_fn, f,                                                         \
+      "env", "proxy_" #_fn, f,                                                                     \
       &ConvertFunctionWordToUint32<decltype(exports::_fn),                                         \
-                                    f>::convertFunctionWordToUint32);                    \
-  } else { \
+                                    f>::convertFunctionWordToUint32);                              \
+  } else {                                                                                         \
     wasm_vm_->registerCallback(                                                                    \
       "env", "proxy_" #_fn, &exports::_fn,                                                         \
       &ConvertFunctionWordToUint32<decltype(exports::_fn),                                         \
-                                    exports::_fn>::convertFunctionWordToUint32);                    \
+                                    exports::_fn>::convertFunctionWordToUint32);                   \
   } \
 }
   _REGISTER_PROXY(log);

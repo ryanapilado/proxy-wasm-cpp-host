@@ -175,11 +175,13 @@ struct StubContainer<void, Args...> {
 
 template<typename R, typename... Args>
 auto constexpr getExportStub(R (*f)(void*, Args...)) -> R (*)(void*, Args...){
+  (void)(f); // use parameter to avoid compiler warning
   return &StubContainer<R, Args...>::stub;
 }
 
 template<typename... Args>
 auto constexpr getExportStub(void (*f)(void*, Args...)) -> void (*)(void*, Args...){
+  (void)(f); // use parameter to avoid compiler warning
   return &StubContainer<Args...>::stub;
 }
 
