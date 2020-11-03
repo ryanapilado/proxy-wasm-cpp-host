@@ -132,7 +132,7 @@ void WasmBase::registerCallbacks() {
     wasm_vm_->registerCallback(                                                                    \
       "env", "proxy_" #_fn, &exports::_fn,                                                         \
       &ConvertFunctionWordToUint32<decltype(exports::_fn),                                         \
-                                    exports::_fn>::convertFunctionWordToUint32);                   \
+                                   exports::_fn>::convertFunctionWordToUint32);                   \
   } 
 
   _REGISTER_PROXY(log);
